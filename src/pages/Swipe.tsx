@@ -97,9 +97,9 @@ export const Swipe = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-secondary pt-2 md:pt-4 pb-20 px-4">
-        <div className="max-w-md mx-auto">
-          <div className="flex justify-between items-center mb-3 md:mb-4">
+      <div className="min-h-screen bg-secondary pt-2 md:pt-4 pb-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-between items-center mb-4 md:mb-6 max-w-2xl mx-auto">
             <h1 className="text-xl md:text-2xl font-bold text-white">Discover Movies</h1>
             {canUndo && (
               <Button onClick={handleUndo} variant="secondary" size="sm">
@@ -108,7 +108,7 @@ export const Swipe = () => {
             )}
           </div>
 
-          <div className="relative flex items-start justify-center">
+          <div className="relative flex items-start justify-center mb-6">
             <AnimatePresence mode="wait">
               <MovieCard
                 key={currentMovie.id}
@@ -118,8 +118,8 @@ export const Swipe = () => {
             </AnimatePresence>
           </div>
 
-          {/* Action Buttons for Web/Desktop */}
-          <div className="mt-4 md:mt-6 grid grid-cols-2 gap-3 md:gap-4">
+          {/* Action Buttons - Constrained width for mobile, better desktop layout */}
+          <div className="mt-6 md:mt-8 grid grid-cols-2 gap-3 md:gap-4 max-w-sm mx-auto md:max-w-md">
             <Button
               onClick={() => handleSwipe('left')}
               variant="secondary"
