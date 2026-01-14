@@ -51,7 +51,7 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
   return (
     <>
       {/* Mobile & Desktop unified layout */}
-      <div className="fixed inset-0 flex items-center justify-center p-4 pointer-events-none z-20 md:p-8">
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-20 px-[5%] py-8">
         <motion.div
           drag
           dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
@@ -79,7 +79,7 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
                   WebkitBackfaceVisibility: 'hidden'
                 }}
               >
-                <div className="bg-black rounded-3xl shadow-2xl overflow-hidden" onClick={toggleFlip}>
+                <div className="bg-black rounded-3xl shadow-2xl overflow-hidden border-4 border-white" onClick={toggleFlip}>
                   {/* Drag direction indicators */}
                   <motion.div
                     className="absolute inset-0 flex items-center justify-center bg-red-500 bg-opacity-80 z-10 rounded-3xl"
@@ -118,7 +118,7 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
                       </span>
                     </div>
                   </div>
-                  <div className="p-6 bg-black">
+                  <div className="p-8 bg-black">
                     <h2 className="text-2xl font-bold text-white mb-1">
                       {movie.title}
                     </h2>
@@ -151,9 +151,9 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
                   transform: 'rotateY(180deg)'
                 }}
               >
-                <div className="bg-black rounded-3xl shadow-2xl overflow-hidden max-h-[700px] flex flex-col">
+                <div className="bg-black rounded-3xl shadow-2xl overflow-hidden border-4 border-white max-h-[700px] flex flex-col">
                   <div
-                    className="p-6 overflow-y-auto flex-1 space-y-4"
+                    className="p-8 overflow-y-auto flex-1 space-y-4"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div>
