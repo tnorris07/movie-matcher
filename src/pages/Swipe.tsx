@@ -97,9 +97,9 @@ export const Swipe = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-secondary overflow-hidden">
+      <div className="min-h-screen overflow-hidden" style={{ backgroundColor: '#fae7b4' }}>
         {/* Header - fixed position */}
-        <div className="fixed top-0 left-0 right-0 z-10 bg-secondary pt-4 pb-2 px-4">
+        <div className="fixed top-0 left-0 right-0 z-10 pt-4 pb-2 px-4" style={{ backgroundColor: '#fae7b4' }}>
           <div className="flex justify-between items-center max-w-md mx-auto md:max-w-2xl">
             <h1 className="text-xl md:text-2xl font-bold text-white">Discover Movies</h1>
             {canUndo && (

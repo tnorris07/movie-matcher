@@ -52,13 +52,13 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
   return (
     <>
       {/* Mobile Layout (default) - Card flip style */}
-      <div className="md:hidden fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+      <div className="md:hidden fixed inset-0 flex items-center justify-center p-4 pointer-events-none z-20">
         <motion.div
           drag
           dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
           onDragEnd={handleDragEnd}
           style={{ x, y, rotateX, rotateZ, opacity }}
-          className="relative w-full max-w-sm pointer-events-auto cursor-grab active:cursor-grabbing"
+          className="relative w-full max-w-sm pointer-events-auto cursor-grab active:cursor-grabbing z-20"
           whileTap={{ cursor: 'grabbing' }}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -67,18 +67,18 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
         >
           <div style={{ perspective: '1000px' }}>
             <motion.div
-              className="relative w-full"
+              className="relative w-full min-h-[600px]"
               animate={{ rotateY: isFlipped ? 180 : 0 }}
               transition={{ duration: 0.6, type: 'spring' }}
               style={{ transformStyle: 'preserve-3d' }}
             >
             {/* Front of card */}
             <div
-              className="absolute w-full backface-hidden"
-              style={{ backfaceVisibility: 'hidden' }}
+              className="w-full backface-hidden"
+              style={{ backfaceVisibility: 'hidden', position: isFlipped ? 'absolute' : 'relative' }}
               onClick={toggleFlip}
             >
-              <div className="bg-black rounded-3xl shadow-2xl overflow-hidden relative">
+              <div className="bg-black rounded-3xl shadow-2xl overflow-hidden relative border-4 border-red-500">
                 {/* Drag direction indicators */}
                 <motion.div
                   className="absolute inset-0 flex items-center justify-center bg-red-500 bg-opacity-80 z-10"
@@ -238,9 +238,9 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
       </div>
 
       {/* Desktop Layout - Viewport height based */}
-      <div className="hidden md:flex md:items-center md:justify-center md:h-screen md:fixed md:inset-0 md:pointer-events-none">
+      <div className="hidden md:flex md:items-center md:justify-center md:h-screen md:fixed md:inset-0 md:pointer-events-none z-20">
         <motion.div
-          className="md:pointer-events-auto md:h-[calc(100vh-100px)] md:flex md:items-center md:justify-center"
+          className="md:pointer-events-auto md:h-[calc(100vh-100px)] md:flex md:items-center md:justify-center z-20"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
