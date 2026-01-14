@@ -97,9 +97,10 @@ export const Swipe = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-secondary pt-2 md:pt-4 pb-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center mb-4 md:mb-6 max-w-2xl mx-auto">
+      <div className="min-h-screen bg-secondary overflow-hidden">
+        {/* Header - fixed position */}
+        <div className="fixed top-0 left-0 right-0 z-10 bg-secondary pt-4 pb-2 px-4">
+          <div className="flex justify-between items-center max-w-md mx-auto md:max-w-2xl">
             <h1 className="text-xl md:text-2xl font-bold text-white">Discover Movies</h1>
             {canUndo && (
               <Button onClick={handleUndo} variant="secondary" size="sm">
@@ -107,19 +108,20 @@ export const Swipe = () => {
               </Button>
             )}
           </div>
+        </div>
 
-          <div className="relative flex items-start justify-center mb-6">
-            <AnimatePresence mode="wait">
-              <MovieCard
-                key={currentMovie.id}
-                movie={currentMovie}
-                onSwipe={handleSwipe}
-              />
-            </AnimatePresence>
-          </div>
+        {/* Movie Card */}
+        <AnimatePresence mode="wait">
+          <MovieCard
+            key={currentMovie.id}
+            movie={currentMovie}
+            onSwipe={handleSwipe}
+          />
+        </AnimatePresence>
 
-          {/* Action Buttons - Constrained width for mobile, better desktop layout */}
-          <div className="mt-6 md:mt-8 grid grid-cols-2 gap-3 md:gap-4 max-w-sm mx-auto md:max-w-md">
+        {/* Action Buttons - fixed at bottom on mobile, centered on desktop */}
+        <div className="fixed bottom-24 left-0 right-0 z-10 px-4 md:bottom-8">
+          <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-sm mx-auto md:max-w-md">
             <Button
               onClick={() => handleSwipe('left')}
               variant="secondary"
