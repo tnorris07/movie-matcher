@@ -36,11 +36,11 @@ export const UserMenu = () => {
   };
 
   return (
-    <div className="md:hidden fixed top-4 right-4 z-50" ref={menuRef}>
+    <div className="relative" ref={menuRef}>
       {/* User Avatar Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-800 border-2 border-gray-700 hover:border-primary transition-colors overflow-hidden"
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-700 hover:border-primary transition-colors overflow-hidden"
       >
         {user?.user_metadata?.avatar_url ? (
           <img
@@ -55,9 +55,9 @@ export const UserMenu = () => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-72 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-300 overflow-hidden">
           {/* User Info Section */}
-          <div className="p-4 border-b border-gray-700">
+          <div className="p-4 border-b border-gray-300">
             <div className="flex items-center space-x-3">
               {user?.user_metadata?.avatar_url ? (
                 <img
@@ -71,10 +71,10 @@ export const UserMenu = () => {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-white font-medium truncate">
+                <p className="text-gray-900 font-medium truncate">
                   {user?.user_metadata?.full_name || 'User'}
                 </p>
-                <p className="text-gray-400 text-sm truncate">
+                <p className="text-gray-600 text-sm truncate">
                   {user?.email}
                 </p>
               </div>
@@ -85,7 +85,7 @@ export const UserMenu = () => {
           <div className="py-2">
             <button
               onClick={handleProfileClick}
-              className="w-full px-4 py-2 text-left text-white hover:bg-gray-700 transition-colors flex items-center space-x-2"
+              className="w-full px-4 py-2 text-left text-gray-900 hover:bg-gray-100 transition-colors flex items-center space-x-2"
             >
               <span>👤</span>
               <span>View Profile</span>
@@ -93,7 +93,7 @@ export const UserMenu = () => {
 
             <button
               disabled
-              className="w-full px-4 py-2 text-left text-gray-500 cursor-not-allowed flex items-center space-x-2"
+              className="w-full px-4 py-2 text-left text-gray-400 cursor-not-allowed flex items-center space-x-2"
             >
               <span>⚙️</span>
               <span>Settings (Coming Soon)</span>
@@ -101,7 +101,7 @@ export const UserMenu = () => {
           </div>
 
           {/* Sign Out Button */}
-          <div className="p-3 border-t border-gray-700">
+          <div className="p-3 border-t border-gray-300">
             <Button
               onClick={handleSignOut}
               variant="outline"

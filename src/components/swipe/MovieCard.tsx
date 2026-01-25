@@ -3,6 +3,7 @@ import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-mo
 import type { PanInfo } from 'framer-motion';
 import type { Movie } from '../../types';
 import { Button } from '../common/Button';
+import { Star, Clock, Play, X, Heart, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface MovieCardProps {
   movie: Movie;
@@ -16,8 +17,8 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const rotateX = useTransform(y, [-200, 200], [15, -15]);
-  const rotateZ = useTransform(x, [-200, 200], [-15, 15]);
+  const rotateX = useTransform(y, [-200, 200], [10, -10]);
+  const rotateZ = useTransform(x, [-200, 200], [-10, 10]);
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0.5, 1, 1, 1, 0.5]);
 
   // Visual feedback for drag direction
@@ -62,7 +63,7 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
   return (
     <>
       {/* Mobile & Desktop unified layout */}
-      <div className="absolute top-24 left-0 right-0 bottom-28 pointer-events-none z-20 px-[5%] flex items-start justify-center pt-4">
+      <div className="absolute left-0 right-0 bottom-28 pointer-events-none z-20 px-4 md:px-[5%] flex items-start justify-center pt-4" style={{ top: '80px' }}>
         <motion.div
           drag={!isFlipped}
           dragConstraints={!isFlipped ? { left: 0, right: 0, top: 0, bottom: 0 } : undefined}
@@ -70,10 +71,10 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
           style={{ x, y, rotateX, rotateZ, opacity }}
           className="w-full max-w-sm pointer-events-auto cursor-grab active:cursor-grabbing z-20"
           whileTap={{ cursor: 'grabbing' }}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: -20 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
         >
           <AnimatePresence mode="wait">
             {!isFlipped && (
@@ -86,65 +87,107 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
                 transition={{ duration: 0.3 }}
                 className="w-full"
               >
-                <div className="bg-black rounded-3xl shadow-2xl overflow-hidden border-4 border-white h-[550px] w-full max-w-sm flex flex-col mx-auto" style={{ backgroundColor: '#000000', width: '384px' }} onClick={toggleFlip}>
+                <div
+                  className="bg-white rounded-3xl shadow-card overflow-hidden cursor-pointer transition-shadow hover:shadow-card-hover"
+                  style={{ maxWidth: '384px', margin: '0 auto' }}
+                  onClick={toggleFlip}
+                >
                   {/* Drag direction indicators */}
                   <motion.div
-                    className="absolute inset-0 flex items-center justify-center bg-red-500 bg-opacity-80 z-10 rounded-3xl"
+                    className="absolute inset-0 flex items-center justify-center bg-red-500/90 z-10 rounded-3xl"
                     style={{ opacity: leftOpacity }}
                   >
-                    <span className="text-white text-6xl font-bold">✕</span>
+                    <div className="flex flex-col items-center gap-2">
+                      <X className="w-16 h-16 text-white" strokeWidth={3} />
+                      <span className="text-white text-xl font-bold">Pass</span>
+                    </div>
                   </motion.div>
                   <motion.div
-                    className="absolute inset-0 flex items-center justify-center bg-green-500 bg-opacity-80 z-10 rounded-3xl"
+                    className="absolute inset-0 flex items-center justify-center bg-emerald-500/90 z-10 rounded-3xl"
                     style={{ opacity: rightOpacity }}
                   >
-                    <span className="text-white text-6xl font-bold">❤️</span>
+                    <div className="flex flex-col items-center gap-2">
+                      <Heart className="w-16 h-16 text-white" strokeWidth={2} fill="white" />
+                      <span className="text-white text-xl font-bold">Like</span>
+                    </div>
                   </motion.div>
                   <motion.div
-                    className="absolute inset-0 flex items-center justify-center bg-blue-500 bg-opacity-80 z-10 rounded-3xl"
+                    className="absolute inset-0 flex items-center justify-center bg-blue-500/90 z-10 rounded-3xl"
                     style={{ opacity: upOpacity }}
                   >
-                    <span className="text-white text-4xl font-bold">👍 Seen</span>
+                    <div className="flex flex-col items-center gap-2">
+                      <ThumbsUp className="w-16 h-16 text-white" strokeWidth={2} />
+                      <span className="text-white text-xl font-bold">Seen & Liked</span>
+                    </div>
                   </motion.div>
                   <motion.div
-                    className="absolute inset-0 flex items-center justify-center bg-gray-500 bg-opacity-80 z-10 rounded-3xl"
+                    className="absolute inset-0 flex items-center justify-center bg-secondary-500/90 z-10 rounded-3xl"
                     style={{ opacity: downOpacity }}
                   >
-                    <span className="text-white text-4xl font-bold">👎 Seen</span>
+                    <div className="flex flex-col items-center gap-2">
+                      <ThumbsDown className="w-16 h-16 text-white" strokeWidth={2} />
+                      <span className="text-white text-xl font-bold">Seen & Disliked</span>
+                    </div>
                   </motion.div>
 
-                  <div className="relative">
+                  {/* Movie Poster */}
+                  <div className="relative aspect-[2/3] max-h-[400px] overflow-hidden">
                     <img
                       src={movie.poster_url}
                       alt={movie.title}
-                      className="w-full h-[400px] object-cover"
+                      className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-4 right-4 bg-black bg-opacity-90 px-3 py-1.5 rounded-full">
-                      <span className="text-yellow-400 font-bold text-sm">
-                        ⭐ {movie.tmdb_rating.toFixed(1)}
-                      </span>
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+                    {/* Rating badges */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-2">
+                      <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-soft">
+                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                        <span className="text-secondary-800 font-bold text-sm">
+                          {movie.tmdb_rating.toFixed(1)}
+                        </span>
+                      </div>
+                      {movie.rt_score && (
+                        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-soft">
+                          <span className="text-base">🍅</span>
+                          <span className="text-secondary-800 font-bold text-sm">
+                            {movie.rt_score}%
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Title overlay at bottom of image */}
+                    <div className="absolute bottom-0 left-0 right-0 p-5">
+                      <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">
+                        {movie.title}
+                      </h2>
+                      <div className="flex items-center gap-3 text-white/90 text-sm">
+                        <span>{movie.year}</span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" />
+                          {movie.runtime} min
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="p-8 bg-black" style={{ backgroundColor: '#000000' }}>
-                    <h2 className="text-2xl font-bold text-white mb-1">
-                      {movie.title}
-                    </h2>
-                    <p className="text-gray-400 text-sm mb-3">
-                      {movie.year} · {movie.runtime} min
-                    </p>
-                    <div className="flex flex-wrap gap-2 mb-3">
+
+                  {/* Card content */}
+                  <div className="p-5">
+                    <div className="flex flex-wrap gap-2 mb-4">
                       {movie.genres.slice(0, 3).map((genre) => (
                         <span
                           key={genre}
-                          className="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full"
+                          className="px-3 py-1 bg-primary-50 text-primary-600 text-xs font-medium rounded-full"
                         >
                           {genre}
                         </span>
                       ))}
                     </div>
-                    <div className="text-center text-sm text-gray-400 pt-2 border-t border-gray-800">
-                      Tap to see details
-                    </div>
+                    <p className="text-secondary-500 text-sm text-center">
+                      Tap card for details • Swipe to decide
+                    </p>
                   </div>
                 </div>
               </motion.div>
@@ -160,89 +203,113 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
                 className="w-full"
               >
                 <div
-                  className="bg-black rounded-3xl shadow-2xl overflow-hidden border-4 border-white h-[550px] w-full max-w-sm flex flex-col mx-auto"
-                  style={{ backgroundColor: '#000000', width: '384px' }}
+                  className="bg-white rounded-3xl shadow-card overflow-hidden cursor-pointer"
+                  style={{ maxWidth: '384px', margin: '0 auto', height: '580px' }}
                   onClick={toggleFlip}
                 >
                   <div
                     ref={scrollRef}
-                    className="px-8 pb-8 overflow-y-auto space-y-4 flex-1"
-                    style={{ paddingTop: '3rem' }}
+                    className="overflow-y-auto h-full p-6 space-y-5"
                   >
+                    {/* Header */}
                     <div>
-                      <h2 className="text-2xl font-bold text-white mb-1">
+                      <h2 className="text-2xl font-bold text-secondary-800 mb-1">
                         {movie.title}
                       </h2>
-                      <p className="text-gray-400 text-sm">
-                        {movie.year} · {movie.runtime} min
-                      </p>
+                      <div className="flex items-center gap-3 text-secondary-500 text-sm">
+                        <span>{movie.year}</span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" />
+                          {movie.runtime} min
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="flex gap-4">
-                      <div>
-                        <p className="text-xs text-gray-400">TMDB</p>
-                        <p className="text-yellow-400 font-bold">
-                          {movie.tmdb_rating.toFixed(1)}/10
-                        </p>
+                    {/* Ratings */}
+                    <div className="flex gap-6 p-4 bg-secondary-50 rounded-2xl">
+                      <div className="text-center">
+                        <p className="text-xs text-secondary-400 mb-1">TMDB</p>
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                          <span className="text-secondary-800 font-bold">
+                            {movie.tmdb_rating.toFixed(1)}
+                          </span>
+                        </div>
                       </div>
                       {movie.imdb_rating && (
-                        <div>
-                          <p className="text-xs text-gray-400">IMDb</p>
-                          <p className="text-yellow-400 font-bold">
-                            {movie.imdb_rating.toFixed(1)}/10
+                        <div className="text-center">
+                          <p className="text-xs text-secondary-400 mb-1">IMDb</p>
+                          <p className="text-secondary-800 font-bold">
+                            {movie.imdb_rating.toFixed(1)}
                           </p>
                         </div>
                       )}
                       {movie.rt_score && (
-                        <div>
-                          <p className="text-xs text-gray-400">RT</p>
-                          <p className="text-yellow-400 font-bold">{movie.rt_score}%</p>
+                        <div className="text-center">
+                          <p className="text-xs text-secondary-400 mb-1">RT</p>
+                          <p className="text-secondary-800 font-bold">{movie.rt_score}%</p>
                         </div>
                       )}
                     </div>
 
+                    {/* Director */}
                     <div>
-                      <p className="text-xs text-gray-400">Directed by</p>
-                      <p className="text-white text-sm">{movie.director}</p>
+                      <p className="text-xs text-secondary-400 mb-1 font-medium uppercase tracking-wide">
+                        Directed by
+                      </p>
+                      <p className="text-secondary-700">{movie.director}</p>
                     </div>
 
+                    {/* Cast */}
                     <div>
-                      <p className="text-xs text-gray-400">Cast</p>
-                      <p className="text-white text-sm">{movie.movie_cast.slice(0, 5).join(', ')}</p>
+                      <p className="text-xs text-secondary-400 mb-1 font-medium uppercase tracking-wide">
+                        Cast
+                      </p>
+                      <p className="text-secondary-700">{movie.movie_cast.slice(0, 5).join(', ')}</p>
                     </div>
 
+                    {/* Genres */}
                     <div className="flex flex-wrap gap-2">
                       {movie.genres.map((genre) => (
                         <span
                           key={genre}
-                          className="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full"
+                          className="px-3 py-1 bg-primary-50 text-primary-600 text-xs font-medium rounded-full"
                         >
                           {genre}
                         </span>
                       ))}
                     </div>
 
+                    {/* Synopsis */}
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Synopsis</p>
-                      <p className="text-white text-sm leading-relaxed">{movie.plot_synopsis}</p>
+                      <p className="text-xs text-secondary-400 mb-2 font-medium uppercase tracking-wide">
+                        Synopsis
+                      </p>
+                      <p className="text-secondary-600 text-sm leading-relaxed">
+                        {movie.plot_synopsis}
+                      </p>
                     </div>
 
+                    {/* Trailer Button */}
                     {movie.trailer_url && (
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           window.open(movie.trailer_url!, '_blank');
                         }}
-                        variant="secondary"
-                        size="sm"
+                        variant="outline"
+                        size="md"
                         fullWidth
                       >
+                        <Play className="w-4 h-4" />
                         Watch Trailer
                       </Button>
                     )}
-                  </div>
-                  <div className="p-4 bg-gray-900 border-t border-gray-800 text-center text-sm text-gray-400 cursor-pointer">
-                    Tap to flip back
+
+                    {/* Tap hint */}
+                    <p className="text-secondary-400 text-sm text-center pt-2">
+                      Tap to flip back
+                    </p>
                   </div>
                 </div>
               </motion.div>
