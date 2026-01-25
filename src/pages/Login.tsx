@@ -2,10 +2,24 @@ import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
 
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const isValidPassword = (password: string): boolean => {
+  return password.length >= 6;
+};
+
 export const Login = () => {
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, signUpWithEmail, signInWithEmail } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [emailLoading, setEmailLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -15,6 +29,50 @@ export const Login = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in');
       setLoading(false);
+    }
+  };
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    if (mode === 'signup' && password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    try {
+      setEmailLoading(true);
+      setError(null);
+
+      if (mode === 'signup') {
+        await signUpWithEmail(email, password);
+      } else {
+        await signInWithEmail(email, password);
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.message.includes('already registered')) {
+          setError('This email is already registered. Try signing in instead.');
+        } else if (err.message.includes('Invalid login')) {
+          setError('Invalid email or password');
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError('Failed to authenticate');
+      }
+    } finally {
+      setEmailLoading(false);
     }
   };
 
@@ -45,13 +103,108 @@ export const Login = () => {
             </div>
           )}
 
+          <form onSubmit={handleEmailAuth} className="space-y-4">
+            <div className="flex gap-2 bg-gray-900 p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setMode('signin')}
+                className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${
+                  mode === 'signin'
+                    ? 'bg-primary text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('signup')}
+                className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${
+                  mode === 'signup'
+                    ? 'bg-primary text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary"
+                required
+                minLength={6}
+              />
+            </div>
+
+            {mode === 'signup' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-primary"
+                  required
+                  minLength={6}
+                />
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={emailLoading}
+              fullWidth
+              size="lg"
+            >
+              {emailLoading
+                ? (mode === 'signup' ? 'Creating Account...' : 'Signing In...')
+                : (mode === 'signup' ? 'Create Account' : 'Sign In')
+              }
+            </Button>
+          </form>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-800 text-gray-400">OR</span>
+            </div>
+          </div>
+
           <Button
             onClick={handleGoogleSignIn}
             disabled={loading}
+            variant="outline"
             fullWidth
             size="lg"
           >
-            {loading ? 'Signing in...' : 'Sign in with Google'}
+            {loading ? 'Signing in...' : 'Continue with Google'}
           </Button>
 
           <div className="text-xs text-gray-500 text-center">

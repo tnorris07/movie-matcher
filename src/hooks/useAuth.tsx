@@ -10,6 +10,8 @@ interface AuthContextType {
   couple: Couple | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signUpWithEmail: (email: string, password: string) => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   createCouple: () => Promise<Couple>;
   joinCouple: (inviteCode: string) => Promise<Couple>;
@@ -78,6 +80,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       options: {
         redirectTo: window.location.origin,
       },
+    });
+
+    if (error) {
+      throw error;
+    }
+  };
+
+  const signUpWithEmail = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      throw error;
+    }
+  };
+
+  const signInWithEmail = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
     if (error) {
@@ -170,6 +197,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     couple,
     loading,
     signInWithGoogle,
+    signUpWithEmail,
+    signInWithEmail,
     signOut,
     createCouple,
     joinCouple,

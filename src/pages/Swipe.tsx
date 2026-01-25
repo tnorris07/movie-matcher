@@ -8,6 +8,7 @@ import { MovieCard } from '../components/swipe/MovieCard';
 import { MatchNotification } from '../components/swipe/MatchNotification';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Button } from '../components/common/Button';
+import { Header } from '../components/common/Header';
 import type { SwipeType, Movie } from '../types';
 
 export const Swipe = () => {
@@ -97,19 +98,7 @@ export const Swipe = () => {
 
   return (
     <>
-      <div className="min-h-screen overflow-hidden" style={{ backgroundColor: '#fae7b4' }}>
-        {/* Header - fixed position */}
-        <div className="fixed top-0 left-0 right-0 z-10 pt-4 pb-2 px-4" style={{ backgroundColor: '#fae7b4' }}>
-          <div className="flex justify-between items-center max-w-md mx-auto md:max-w-2xl">
-            <h1 className="text-xl md:text-2xl font-bold text-white">Discover Movies</h1>
-            {canUndo && (
-              <Button onClick={handleUndo} variant="secondary" size="sm">
-                Undo
-              </Button>
-            )}
-          </div>
-        </div>
-
+      <div className="fixed inset-0" style={{ backgroundColor: '#9CAF88', zIndex: 0 }}>
         {/* Movie Card */}
         <AnimatePresence mode="wait">
           <MovieCard
@@ -118,53 +107,38 @@ export const Swipe = () => {
             onSwipe={handleSwipe}
           />
         </AnimatePresence>
+      </div>
 
-        {/* Action Buttons - fixed at bottom on mobile, centered on desktop */}
-        <div className="fixed bottom-24 left-0 right-0 z-10 px-4 md:bottom-8">
-          <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-sm mx-auto md:max-w-md">
-            <Button
-              onClick={() => handleSwipe('left')}
-              variant="secondary"
-              size="lg"
-              fullWidth
-            >
-              ✕ Skip
-            </Button>
-            <Button
-              onClick={() => handleSwipe('right')}
-              variant="primary"
-              size="lg"
-              fullWidth
-            >
-              ❤️ Want to Watch
-            </Button>
-            <Button
-              onClick={() => handleSwipe('down')}
-              variant="outline"
-              size="sm"
-              fullWidth
-            >
-              ↓ Seen & No
-            </Button>
-            <Button
-              onClick={() => handleSwipe('up')}
-              variant="outline"
-              size="sm"
-              fullWidth
-            >
-              ↑ Seen & Yes
-            </Button>
-          </div>
-
-          {!couple?.user2_id && (
-            <div className="mt-6 bg-blue-900 border border-blue-700 text-blue-200 px-4 py-3 rounded-lg">
-              <p className="text-sm">
-                <strong>Solo mode:</strong> Your swipes are being saved! When your partner joins with code{' '}
-                <span className="font-mono font-bold">{couple?.invite_code}</span>, you'll see matches automatically.
-              </p>
-            </div>
-          )}
-        </div>
+      {/* Action Buttons - fixed at bottom on mobile, centered on desktop */}
+      <div className="fixed left-0 md:left-60 right-0 z-50 flex justify-center gap-2" style={{ bottom: '80px' }}>
+        <Button
+          onClick={() => handleSwipe('left')}
+          variant="secondary"
+          size="sm"
+        >
+          ✕
+        </Button>
+        <Button
+          onClick={() => handleSwipe('right')}
+          variant="primary"
+          size="sm"
+        >
+          ❤️
+        </Button>
+        <Button
+          onClick={() => handleSwipe('up')}
+          variant="outline"
+          size="sm"
+        >
+          👍
+        </Button>
+        <Button
+          onClick={() => handleSwipe('down')}
+          variant="outline"
+          size="sm"
+        >
+          👎
+        </Button>
       </div>
 
       <AnimatePresence>

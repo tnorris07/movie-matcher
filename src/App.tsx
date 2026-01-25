@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { LoadingScreen } from './components/common/LoadingSpinner';
 import { BottomNav } from './components/common/BottomNav';
+import { UserMenu } from './components/common/UserMenu';
+import { Sidebar } from './components/common/Sidebar';
+import { Header } from './components/common/Header';
 import { Login } from './pages/Login';
 import { CoupleSetup } from './pages/CoupleSetup';
 import { Swipe } from './pages/Swipe';
@@ -73,7 +76,13 @@ function AppRoutes() {
         path="/swipe"
         element={
           <CoupleProtectedRoute>
-            <Swipe />
+            <Header />
+            <div className="flex h-screen">
+              <Sidebar />
+              <main className="flex-1 md:ml-60 pt-16 overflow-hidden">
+                <Swipe />
+              </main>
+            </div>
             <BottomNav />
           </CoupleProtectedRoute>
         }
@@ -82,8 +91,14 @@ function AppRoutes() {
         path="/watchlist"
         element={
           <CoupleProtectedRoute>
-            <WatchList />
-            <BottomNav />
+            <div className="flex h-screen">
+              <Sidebar />
+              <main className="flex-1 md:ml-60">
+                <UserMenu />
+                <WatchList />
+                <BottomNav />
+              </main>
+            </div>
           </CoupleProtectedRoute>
         }
       />
@@ -91,8 +106,14 @@ function AppRoutes() {
         path="/profile"
         element={
           <CoupleProtectedRoute>
-            <Profile />
-            <BottomNav />
+            <div className="flex h-screen">
+              <Sidebar />
+              <main className="flex-1 md:ml-60">
+                <UserMenu />
+                <Profile />
+                <BottomNav />
+              </main>
+            </div>
           </CoupleProtectedRoute>
         }
       />

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
+import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import type { Movie } from '../../types';
 import { Button } from '../common/Button';
@@ -12,6 +12,7 @@ interface MovieCardProps {
 
 export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -48,14 +49,24 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
     setIsFlipped(!isFlipped);
   };
 
+  useEffect(() => {
+    if (isFlipped && scrollRef.current) {
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = 0;
+        }
+      }, 50);
+    }
+  }, [isFlipped]);
+
   return (
     <>
       {/* Mobile & Desktop unified layout */}
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-20 px-[5%] py-8">
+      <div className="absolute top-24 left-0 right-0 bottom-28 pointer-events-none z-20 px-[5%] flex items-start justify-center pt-4">
         <motion.div
-          drag
-          dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-          onDragEnd={handleDragEnd}
+          drag={!isFlipped}
+          dragConstraints={!isFlipped ? { left: 0, right: 0, top: 0, bottom: 0 } : undefined}
+          onDragEnd={!isFlipped ? handleDragEnd : undefined}
           style={{ x, y, rotateX, rotateZ, opacity }}
           className="w-full max-w-sm pointer-events-auto cursor-grab active:cursor-grabbing z-20"
           whileTap={{ cursor: 'grabbing' }}
@@ -64,22 +75,18 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <div style={{ perspective: '2000px' }}>
-            <motion.div
-              className="relative w-full"
-              animate={{ rotateY: isFlipped ? 180 : 0 }}
-              transition={{ duration: 0.6 }}
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              {/* Front of card */}
-              <div
+          <AnimatePresence mode="wait">
+            {!isFlipped && (
+              /* Front of card */
+              <motion.div
+                key="front"
+                initial={{ rotateY: 0 }}
+                animate={{ rotateY: 0 }}
+                exit={{ rotateY: 90 }}
+                transition={{ duration: 0.3 }}
                 className="w-full"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden'
-                }}
               >
-                <div className="bg-black rounded-3xl shadow-2xl overflow-hidden border-4 border-white" onClick={toggleFlip}>
+                <div className="bg-black rounded-3xl shadow-2xl overflow-hidden border-4 border-white h-[550px] w-full max-w-sm flex flex-col mx-auto" style={{ backgroundColor: '#000000', width: '384px' }} onClick={toggleFlip}>
                   {/* Drag direction indicators */}
                   <motion.div
                     className="absolute inset-0 flex items-center justify-center bg-red-500 bg-opacity-80 z-10 rounded-3xl"
@@ -110,7 +117,7 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
                     <img
                       src={movie.poster_url}
                       alt={movie.title}
-                      className="w-full h-[500px] object-cover"
+                      className="w-full h-[400px] object-cover"
                     />
                     <div className="absolute top-4 right-4 bg-black bg-opacity-90 px-3 py-1.5 rounded-full">
                       <span className="text-yellow-400 font-bold text-sm">
@@ -118,7 +125,7 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
                       </span>
                     </div>
                   </div>
-                  <div className="p-8 bg-black">
+                  <div className="p-8 bg-black" style={{ backgroundColor: '#000000' }}>
                     <h2 className="text-2xl font-bold text-white mb-1">
                       {movie.title}
                     </h2>
@@ -140,21 +147,27 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Back of card - Details */}
-              <div
-                className="absolute top-0 left-0 w-full"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                  transform: 'rotateY(180deg)'
-                }}
+              </motion.div>
+            )}
+            {isFlipped && (
+              /* Back of card - Details */
+              <motion.div
+                key="back"
+                initial={{ rotateY: -90 }}
+                animate={{ rotateY: 0 }}
+                exit={{ rotateY: 90 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
               >
-                <div className="bg-black rounded-3xl shadow-2xl overflow-hidden border-4 border-white max-h-[700px] flex flex-col">
+                <div
+                  className="bg-black rounded-3xl shadow-2xl overflow-hidden border-4 border-white h-[550px] w-full max-w-sm flex flex-col mx-auto"
+                  style={{ backgroundColor: '#000000', width: '384px' }}
+                  onClick={toggleFlip}
+                >
                   <div
-                    className="p-8 overflow-y-auto flex-1 space-y-4"
-                    onClick={(e) => e.stopPropagation()}
+                    ref={scrollRef}
+                    className="px-8 pb-8 overflow-y-auto space-y-4 flex-1"
+                    style={{ paddingTop: '3rem' }}
                   >
                     <div>
                       <h2 className="text-2xl font-bold text-white mb-1">
@@ -228,16 +241,13 @@ export const MovieCard = ({ movie, onSwipe }: MovieCardProps) => {
                       </Button>
                     )}
                   </div>
-                  <div
-                    className="p-4 bg-gray-900 border-t border-gray-800 text-center text-sm text-gray-400 cursor-pointer"
-                    onClick={toggleFlip}
-                  >
+                  <div className="p-4 bg-gray-900 border-t border-gray-800 text-center text-sm text-gray-400 cursor-pointer">
                     Tap to flip back
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
     </>
