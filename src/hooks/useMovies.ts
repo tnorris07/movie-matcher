@@ -40,10 +40,14 @@ export const useUnswipedMovies = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    if (user) {
+    // Reset state when user changes (including logout/login)
+    setMovies([]);
+    setCurrentIndex(0);
+
+    if (user?.id) {
       fetchUnswipedMovies();
     }
-  }, [user]);
+  }, [user?.id]); // Depend on user.id specifically, not the whole user object
 
   const fetchUnswipedMovies = async () => {
     if (!user) return;

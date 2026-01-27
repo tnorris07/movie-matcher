@@ -2,8 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { LoadingScreen } from './components/common/LoadingSpinner';
 import { BottomNav } from './components/common/BottomNav';
-import { UserMenu } from './components/common/UserMenu';
-import { Sidebar } from './components/common/Sidebar';
 import { Header } from './components/common/Header';
 import { Login } from './pages/Login';
 import { CoupleSetup } from './pages/CoupleSetup';
@@ -77,12 +75,9 @@ function AppRoutes() {
         element={
           <CoupleProtectedRoute>
             <Header />
-            <div className="flex h-screen">
-              <Sidebar />
-              <main className="flex-1 md:ml-60 pt-16 overflow-hidden">
-                <Swipe />
-              </main>
-            </div>
+            <main className="pt-16">
+              <Swipe />
+            </main>
             <BottomNav />
           </CoupleProtectedRoute>
         }
@@ -91,14 +86,11 @@ function AppRoutes() {
         path="/watchlist"
         element={
           <CoupleProtectedRoute>
-            <div className="flex h-screen">
-              <Sidebar />
-              <main className="flex-1 md:ml-60">
-                <UserMenu />
-                <WatchList />
-                <BottomNav />
-              </main>
-            </div>
+            <Header />
+            <main className="pt-16">
+              <WatchList />
+            </main>
+            <BottomNav />
           </CoupleProtectedRoute>
         }
       />
@@ -106,14 +98,11 @@ function AppRoutes() {
         path="/profile"
         element={
           <CoupleProtectedRoute>
-            <div className="flex h-screen">
-              <Sidebar />
-              <main className="flex-1 md:ml-60">
-                <UserMenu />
-                <Profile />
-                <BottomNav />
-              </main>
-            </div>
+            <Header />
+            <main className="pt-16">
+              <Profile />
+            </main>
+            <BottomNav />
           </CoupleProtectedRoute>
         }
       />

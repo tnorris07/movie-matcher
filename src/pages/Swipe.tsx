@@ -1,14 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { useUnswipedMovies } from '../hooks/useMovies';
 import { useSwipes } from '../hooks/useSwipes';
 import { useAuth } from '../hooks/useAuth';
 import { MovieCard } from '../components/swipe/MovieCard';
+import type { MovieCardRef } from '../components/swipe/MovieCard';
 import { MatchNotification } from '../components/swipe/MatchNotification';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Button } from '../components/common/Button';
-import { X, Heart, ThumbsUp, ThumbsDown, Film } from 'lucide-react';
+import { X, Heart, ThumbsUp, ThumbsDown, Film, ArrowLeft, ArrowRight, ArrowUp, ArrowDown } from 'lucide-react';
 import type { SwipeType, Movie } from '../types';
 
 export const Swipe = () => {
@@ -17,6 +18,7 @@ export const Swipe = () => {
   const { createSwipe } = useSwipes();
   const [matchedMovie, setMatchedMovie] = useState<Movie | null>(null);
   const navigate = useNavigate();
+  const movieCardRef = useRef<MovieCardRef>(null);
 
   useEffect(() => {
     if (!couple) {
@@ -58,7 +60,16 @@ export const Swipe = () => {
     }
   }, [currentMovie, createSwipe, nextMovie, setMatchedMovie]);
 
-  // Arrow key support for desktop
+  // Handle button clicks - trigger animation then swipe
+  const handleButtonSwipe = useCallback((direction: 'left' | 'right' | 'up' | 'down') => {
+    if (movieCardRef.current) {
+      movieCardRef.current.triggerSwipe(direction);
+    } else {
+      handleSwipe(direction);
+    }
+  }, [handleSwipe]);
+
+  // Arrow key support for desktop - with animations
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!currentMovie) return;
@@ -66,26 +77,26 @@ export const Swipe = () => {
       switch (event.key) {
         case 'ArrowLeft':
           event.preventDefault();
-          handleSwipe('left');
+          handleButtonSwipe('left');
           break;
         case 'ArrowRight':
           event.preventDefault();
-          handleSwipe('right');
+          handleButtonSwipe('right');
           break;
         case 'ArrowUp':
           event.preventDefault();
-          handleSwipe('up');
+          handleButtonSwipe('up');
           break;
         case 'ArrowDown':
           event.preventDefault();
-          handleSwipe('down');
+          handleButtonSwipe('down');
           break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentMovie, handleSwipe]);
+  }, [currentMovie, handleButtonSwipe]);
 
   if (loading) {
     return (
@@ -129,6 +140,7 @@ export const Swipe = () => {
         <AnimatePresence mode="wait">
           <MovieCard
             key={currentMovie.id}
+            ref={movieCardRef}
             movie={currentMovie}
             onSwipe={handleSwipe}
           />
@@ -136,63 +148,80 @@ export const Swipe = () => {
       </div>
 
       {/* Action Buttons - fixed at bottom */}
-      <div className="fixed left-0 md:left-60 right-0 z-50 flex justify-center items-center gap-3 px-4" style={{ bottom: '100px' }}>
-        <Button
-          onClick={() => handleSwipe('left')}
-          variant="danger"
-          size="icon"
-          className="rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-all"
-          title="Pass"
-        >
-          <X className="w-6 h-6" />
-        </Button>
+      <div className="fixed left-0 right-0 z-50 flex justify-center items-end gap-3 px-4" style={{ bottom: '90px' }}>
+        {/* Pass button */}
+        <div className="flex flex-col items-center gap-1">
+          <Button
+            onClick={() => handleButtonSwipe('left')}
+            variant="danger"
+            size="icon"
+            className="rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-all"
+            title="Pass (Left Arrow)"
+          >
+            <X className="w-6 h-6" />
+          </Button>
+          <div className="flex items-center gap-1 text-xs text-secondary-400">
+            <ArrowLeft className="w-3 h-3" />
+            <span>Pass</span>
+          </div>
+        </div>
 
-        <Button
-          onClick={() => handleSwipe('down')}
-          variant="secondary"
-          size="icon"
-          className="rounded-full w-12 h-12 shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-          title="Seen & Disliked"
-        >
-          <ThumbsDown className="w-5 h-5" />
-        </Button>
+        {/* Seen & Disliked button */}
+        <div className="flex flex-col items-center gap-1">
+          <Button
+            onClick={() => handleButtonSwipe('down')}
+            variant="secondary"
+            size="icon"
+            className="rounded-full w-12 h-12 shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+            title="Seen & Disliked (Down Arrow)"
+          >
+            <ThumbsDown className="w-5 h-5" />
+          </Button>
+          <div className="flex items-center gap-1 text-xs text-secondary-400">
+            <ArrowDown className="w-3 h-3" />
+            <span>Seen</span>
+          </div>
+        </div>
 
-        <Button
-          onClick={() => handleSwipe('up')}
-          variant="outline"
-          size="icon"
-          className="rounded-full w-12 h-12 shadow-lg hover:shadow-xl hover:scale-105 transition-all bg-white"
-          title="Seen & Liked"
-        >
-          <ThumbsUp className="w-5 h-5 text-blue-500" />
-        </Button>
+        {/* Seen & Liked button */}
+        <div className="flex flex-col items-center gap-1">
+          <Button
+            onClick={() => handleButtonSwipe('up')}
+            variant="outline"
+            size="icon"
+            className="rounded-full w-12 h-12 shadow-lg hover:shadow-xl hover:scale-105 transition-all bg-white"
+            title="Seen & Liked (Up Arrow)"
+          >
+            <ThumbsUp className="w-5 h-5 text-blue-500" />
+          </Button>
+          <div className="flex items-center gap-1 text-xs text-secondary-400">
+            <ArrowUp className="w-3 h-3" />
+            <span>Loved</span>
+          </div>
+        </div>
 
-        <Button
-          onClick={() => handleSwipe('right')}
-          variant="success"
-          size="icon"
-          className="rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-all"
-          title="Like"
-        >
-          <Heart className="w-6 h-6" />
-        </Button>
+        {/* Like button */}
+        <div className="flex flex-col items-center gap-1">
+          <Button
+            onClick={() => handleButtonSwipe('right')}
+            variant="success"
+            size="icon"
+            className="rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-all"
+            title="Like (Right Arrow)"
+          >
+            <Heart className="w-6 h-6" />
+          </Button>
+          <div className="flex items-center gap-1 text-xs text-secondary-400">
+            <ArrowRight className="w-3 h-3" />
+            <span>Like</span>
+          </div>
+        </div>
       </div>
 
-      {/* Action hints */}
-      <div className="fixed left-0 md:left-60 right-0 z-40 flex justify-center" style={{ bottom: '70px' }}>
-        <div className="flex items-center gap-6 text-xs text-secondary-400">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-red-400"></span>
-            Pass
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-secondary-400"></span>
-            Seen it
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-            Like
-          </span>
+      {/* Keyboard hint */}
+      <div className="fixed left-0 right-0 z-40 flex justify-center" style={{ bottom: '60px' }}>
+        <div className="text-xs text-secondary-400 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full">
+          Use arrow keys to swipe
         </div>
       </div>
 

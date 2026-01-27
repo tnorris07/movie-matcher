@@ -18,11 +18,14 @@ export const useSwipes = () => {
 
       const { data, error } = await supabase
         .from('swipes')
-        .insert({
-          user_id: user.id,
-          movie_id: movieId,
-          swipe_type: swipeType,
-        })
+        .upsert(
+          {
+            user_id: user.id,
+            movie_id: movieId,
+            swipe_type: swipeType,
+          },
+          { onConflict: 'user_id,movie_id' }
+        )
         .select()
         .single();
 

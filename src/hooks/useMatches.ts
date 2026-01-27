@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import type { Match } from '../types';
+import type { Match, Movie } from '../types';
 import { useAuth } from './useAuth';
+
+interface LikeData {
+  movie_id: number;
+  created_at: string;
+  swipe_type: string;
+  movie: Movie;
+}
 
 export const useMatches = () => {
   const { couple } = useAuth();
@@ -61,6 +68,56 @@ export const useMatches = () => {
     loading,
     refetch: fetchMatches,
     markAsWatched,
+  };
+};
+
+export const useMyLikes = () => {
+  const { user } = useAuth();
+  const [likes, setLikes] = useState<LikeData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchMyLikes();
+    }
+  }, [user]);
+
+  const fetchMyLikes = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+
+      // Get all movies the user swiped right on (yes or seen_yes)
+      const { data, error } = await supabase
+        .from('swipes')
+        .select('movie_id, created_at, swipe_type, movie:movies(*)')
+        .eq('user_id', user.id)
+        .in('swipe_type', ['yes', 'seen_yes'])
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Transform the data to match our expected type
+      const transformedData = (data || []).map((item) => ({
+        movie_id: item.movie_id,
+        created_at: item.created_at,
+        swipe_type: item.swipe_type,
+        movie: item.movie as unknown as Movie,
+      }));
+
+      setLikes(transformedData);
+    } catch (err) {
+      console.error('Error fetching my likes:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    likes,
+    loading,
+    refetch: fetchMyLikes,
   };
 };
 
